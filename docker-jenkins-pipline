@@ -1,13 +1,13 @@
 pipeline{
     agent any
     tools {
-        maven 'maven'
+        maven 'MAVEN'
     }
     stages {
-        stage("Build Maven") {
+        stage('Build Maven') {
             steps{
-               checkout scmGit(branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[credentialsId: 'github', url: 'https://github.com/gramyakrishna09/jenkins-docker-repo.git']])
-            
+             checkout scmGit(branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[credentialsId: 'github', url: 'https://github.com/gramyakrishna09/jenkins-docker-repo.git']]])
+
                 sh "mvn -Dmaven.test.failure.ignore=true clean package"
                 
             }
@@ -15,23 +15,19 @@ pipeline{
         stage('Build Docker Image') {
             steps {
                 script {
-                  sh 'docker build -t gramyakrishna09760/myrepo .'
+                  sh 'docker build -t devopshint/my-app-1.0 .'
                 }
             }
         }
         stage('Deploy Docker Image') {
             steps {
                 script {
-                   withCredentials([string(credentialsId: 'gramyakrishna09760', variable: 'dockerhubpwd')]) {
-
-                    sh "docker login -u gramyakrishna09760/repo-p ${dockerhubpwd}"
-                 } 
-                sh 'docker push gramyakrishna09760/myrepo'
+                  withCredentials([string(credentialsId: 'gramyakrishna09760', variable: 'dockerhubpwd')]) {
+                    sh 'docker login -u gramyakrishna09760/repo-p ${dockerhubpwd}'
+                 }  
+                 sh 'docker push gramyakrishna09760/myrepo''
                 }
             }
         }
-    }
-}
-
     }
 }
